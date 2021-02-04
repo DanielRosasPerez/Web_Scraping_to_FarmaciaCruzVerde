@@ -47,17 +47,6 @@ class CruzVerdeCrawlSpider(CrawlSpider):
         
     )
     
-    """
-    # PARA PARSEAR DIRECTAMENTE EN LA URL SEMILLA (DADO QUE LA URL SEMILLA, SIEMPRE ES EN DONDE SE INICIA). EL MÉTODO QUE DEBEMOS USAR ES:
-    
-    def parse_start_url(self, response): # ES FORZOSO QUE TENGA ESTE NOMBRE.
-        pass
-        # LÓGICA DE LA EXTRACCIÓN.
-    
-    # USAR ESTE MÉTODO CADA QUE SE REQUIERA SCRAPEAR DE LA URL SEMILLA, DE ESTA FORMA, EVITAREMOS ALGUNOS DOLORSITOS DE CABEZA. SIN EMBARGO, NOSOTROS NO LAS 
-    HEMOS INGENIADO EN "allow" PARA PODER PARSEAR LA "URL SEMILLA" TAMBIÉN.
-    """
-    
     def parse_medicine(self, response):
         # Using BeautifulSoup:
         BS_object = BeautifulSoup(response.body, 'lxml')
@@ -74,27 +63,3 @@ class CruzVerdeCrawlSpider(CrawlSpider):
             item.add_value("price", medicine_price)
             
             yield item.load_item()
-        
-        """
-        # Using Selector with Xpath (didn't work as I expected):
-        
-        selector = Selector(response)
-        containers = selector.xpath("//div[contains(@class, 'tile-body')][1]")
-        for i,container in enumerate(containers, start=1):
-            medicine_name = container.xpath(".//a[@class='link']/text()").get().replace('\n','').replace('\t','').strip()
-            try:
-                medicine_price = container.xpath(".//div[contains(@class, 'large-price')]/span[contains(@class, 'value')]/text()").get()
-                medicine_price = medicine_price.replace('$','').replace('(Oferta)','').strip()
-                medicine_price = float(medicine_price)
-            except:
-                print("Empty price, let's grab the next sibling.")
-            else:
-                medicine_price = container.xpath("string(.//div[contains(@class, 'large-price')]/span/@content)").get()
-                medicine_price = medicine_price.replace('$','').replace('(Oferta)','').strip()
-                medicine_price = float(medicine_price)
-            
-            item = ItemLoader(Product(), response)
-            item.add_value("product_name", medicine_name)
-            item.add_value("price", float(medicine_price))
-            yield item.load_item()
-        """
